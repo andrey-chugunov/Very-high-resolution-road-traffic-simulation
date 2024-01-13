@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
         String currentDir = System.getProperty("user.dir");
         String geoTiffPath = currentDir + "\\data\\raster\\final_raster.tif";
-        String shapeFilePath = currentDir + "\\data\\shape\\NY_final.shp";
+        String shapeFilePath = currentDir + "\\data\\shape\\NY_3857.shp";
 
         try {
             // Тестирование класса GeoTiff
@@ -21,8 +21,12 @@ public class Main {
 
             // Тестирование класса ShapeFile
             ShapeFile shapeFile = new ShapeFile();
+            String crs = shapeFile.getShapeFileCrs(shapeFilePath);
+            System.out.println("Shape CRS: " + crs);
             List<SimpleFeature> roadGeometries = shapeFile.readRoadGeometries(shapeFilePath);
             System.out.println("Number of road geometries: " + roadGeometries.size());
+            Double firstRoadWidth = shapeFile.getRoadWidth(roadGeometries.getFirst());
+            System.out.println("First road width: " + firstRoadWidth + " meters");
 
             // Тестирование класса Rasterizer
             Rasterizer rasterizer = new Rasterizer();

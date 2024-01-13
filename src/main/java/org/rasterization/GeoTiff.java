@@ -26,9 +26,9 @@ public class GeoTiff {
         return value[0];
     }
 
-    public void printCoverageSize(GridCoverage2D coverage) {
-        int width = coverage.getRenderedImage().getWidth();
-        int height = coverage.getRenderedImage().getHeight();
+    public void printCoverageSize(GridCoverage2D raster) {
+        int width = raster.getRenderedImage().getWidth();
+        int height = raster.getRenderedImage().getHeight();
         System.out.println("Width: " + width + ", Height: " + height);
     }
 

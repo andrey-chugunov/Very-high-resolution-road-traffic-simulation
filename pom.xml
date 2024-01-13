@@ -65,6 +65,11 @@
             <artifactId>gt-epsg-hsql</artifactId>
             <version>29.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-render</artifactId>
+            <version>29.1</version>
+        </dependency>
     </dependencies>
 
 </project>
