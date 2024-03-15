@@ -60,4 +60,15 @@ public class ShapeFile {
             return null;
         }
     }
+
+    public String getTrafficDirection(SimpleFeature feature) {
+        Object trafficDirectionObj = feature.getAttribute("trafdir");
+
+        if (trafficDirectionObj != null && trafficDirectionObj instanceof String) {
+            return ((String) trafficDirectionObj);
+        } else {
+            // Обработка случая, когда значение отсутствует
+            return null;
+        }
+    }
 }

@@ -43,7 +43,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.9</version>
+            <version>1.4.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-main</artifactId>
+            <version>29.1</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
@@ -70,6 +75,17 @@
             <artifactId>gt-render</artifactId>
             <version>29.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.gdal</groupId>
+            <artifactId>gdal</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-metadata</artifactId>
+            <version>29.1</version>
+        </dependency>
     </dependencies>
+
 
 </project>

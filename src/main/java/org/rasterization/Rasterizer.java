@@ -16,22 +16,22 @@ import java.util.List;
 
 public class Rasterizer {
 
-    private final GeoTiff geoTiff;
+    private final Raster raster;
     private final ShapeFile shapeFile;
 
     public Rasterizer() {
-        this.geoTiff = new GeoTiff();
+        this.raster = new Raster();
         this.shapeFile = new ShapeFile();
     }
 
     public void rasterize(String geoTiffPath, String shapeFilePath) throws IOException, FactoryException, TransformException {
         // Читаем геотиф и геометрии из шейпа
-        GridCoverage2D raster = geoTiff.readGeoTiff(geoTiffPath);
+        GridCoverage2D raster = this.raster.readGeoTiff(geoTiffPath);
         List<SimpleFeature> geometries = shapeFile.readRoadGeometries(shapeFilePath);
 
         //Вызов метода растеризации
         int[][] new_raster = rasterizeFunction(raster, geometries);
-        GeoTiff gt = new GeoTiff();
+        Raster gt = new Raster();
         gt.createGeoTiff(new_raster, raster, "output.tif");
     }
 
@@ -46,7 +46,7 @@ public class Rasterizer {
         DirectPosition2D upperLeftCorner = new DirectPosition2D(envelope2D.getMinX(), envelope2D.getMaxY());
         double upperLeftX = upperLeftCorner.getX();
         double upperLeftY = upperLeftCorner.getY();
-
+        int c = 0;
         for (SimpleFeature feature : geometries) {
             // Получаем геометрию и ширину дороги
             Geometry geometry = (Geometry) feature.getDefaultGeometry();
@@ -69,6 +69,8 @@ public class Rasterizer {
                     }
                 }
             }
+            System.out.println(c);
+            c++;
         }
         int count = 0;
         for (int y = 0; y < raster_height; y++) {

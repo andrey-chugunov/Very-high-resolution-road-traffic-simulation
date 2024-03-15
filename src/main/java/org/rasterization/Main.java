@@ -9,11 +9,12 @@ public class Main {
     public static void main(String[] args) {
         String currentDir = System.getProperty("user.dir");
         String geoTiffPath = currentDir + "\\data\\raster\\final_raster.tif";
+        String outputPath = currentDir + "\\data\\raster\\output.tif";
         String shapeFilePath = currentDir + "\\data\\shape\\NY_3857.shp";
 
         try {
             // Тестирование класса GeoTiff
-            GeoTiff geoTiff = new GeoTiff();
+            Raster geoTiff = new Raster();
             GridCoverage2D raster = geoTiff.readGeoTiff(geoTiffPath);
             geoTiff.printCoverageSize(raster);
             double pixelValue = geoTiff.getPixelValue(raster, -8232338, 4977671);
@@ -27,11 +28,17 @@ public class Main {
             System.out.println("Number of road geometries: " + roadGeometries.size());
             Double firstRoadWidth = shapeFile.getRoadWidth(roadGeometries.getFirst());
             System.out.println("First road width: " + firstRoadWidth + " meters");
+            String firstRoadDirection = shapeFile.getTrafficDirection(roadGeometries.getFirst());
+            System.out.println("First road direction: " + firstRoadDirection);
 
             // Тестирование класса Rasterizer
             Rasterizer rasterizer = new Rasterizer();
             rasterizer.rasterize(geoTiffPath, shapeFilePath);
             System.out.println("Rasterization completed");
+            GridCoverage2D output_raster = geoTiff.readGeoTiff(outputPath);
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
