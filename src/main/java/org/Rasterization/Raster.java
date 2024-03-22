@@ -1,4 +1,4 @@
-package org.rasterization;
+package org.Rasterization;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -12,6 +12,7 @@ import org.opengis.geometry.DirectPosition;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
@@ -59,19 +60,35 @@ public class Raster {
         writer.dispose();
     }
 
-    public RenderedImage createRenderedImage(int[][] data) {
+    public static RenderedImage createRenderedImage(int[][] data) {
         int width = data[0].length;
         int height = data.length;
-        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
+
+        BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
+
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int pixelValue = data[y][x] == 1 ? 0x000000 : 0xFFFFFF;
+                int pixelValue;
+                if (data[y][x] == 1) {
+                    pixelValue = 0;
+                } else if (data[y][x] == 0) {
+                    pixelValue = 0xFFFFFF;
+                } else if (data[y][x] == 3) {
+                    pixelValue = 0xFF0000;
+                } else if (data[y][x] == 4) {
+                    pixelValue = 0x0000FF;
+                } else if (data[y][x] == 5) {
+                    pixelValue = 0x00FFFF;
+                } else if (data[y][x] == 6) {
+                    pixelValue = 0xFFFF00;
+                }else {
+                    pixelValue = 0xFFFFFF;
+                }
                 bufferedImage.setRGB(x, y, pixelValue);
             }
         }
 
         return bufferedImage;
     }
-
 }

@@ -2,7 +2,7 @@ package org.UserInterface;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.opengis.referencing.FactoryException;
-import org.rasterization.Raster;
+import org.Rasterization.Raster;
 
 import javax.swing.*;
 import java.awt.*;
@@ -84,7 +84,7 @@ public class GUI {
 
     private static BufferedImage getRenderedImage(GridCoverage2D coverage) throws IOException, FactoryException {
         RenderedImage renderedImage = coverage.getRenderedImage();
-        BufferedImage bufferedImage = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bufferedImage = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = bufferedImage.createGraphics();
         AffineTransform transform = new AffineTransform();
         transform.translate(offsetX, offsetY);

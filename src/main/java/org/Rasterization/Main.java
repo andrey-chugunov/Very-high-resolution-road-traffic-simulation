@@ -1,4 +1,4 @@
-package org.rasterization;
+package org.Rasterization;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.opengis.feature.simple.SimpleFeature;
@@ -34,11 +34,9 @@ public class Main {
             // Тестирование класса Rasterizer
             Rasterizer rasterizer = new Rasterizer();
             rasterizer.rasterize(geoTiffPath, shapeFilePath);
+            //rasterizer.findPositions(geoTiffPath, shapeFilePath);
             System.out.println("Rasterization completed");
             GridCoverage2D output_raster = geoTiff.readGeoTiff(outputPath);
-
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
