@@ -56,46 +56,19 @@ public class ShapeFile {
         return schema.getCoordinateReferenceSystem().toString();
     }
 
-    public MultiLineString generateParallelMultiLineString(MultiLineString multiLine, double distance) {
-        GeometryFactory geometryFactory = new GeometryFactory();
-        List<LineString> parallelLines = new ArrayList<>();
-
-        for (int i = 0; i < multiLine.getNumGeometries(); i++) {
-            LineString line = (LineString) multiLine.getGeometryN(i);
-            LineString parallelLine = (LineString) generateParallelLineString(line, distance);
-            parallelLines.add(parallelLine);
-        }
-
-        return geometryFactory.createMultiLineString(parallelLines.toArray(new LineString[0]));
-    }
-
-    public Geometry generateParallelLineString(LineString line, double distance) {
+    public List<LineString> generateParallelLineStrings(LineString line, double distance) {
         GeometryFactory geometryFactory = new GeometryFactory();
         CoordinateSequence coordinateSequence = line.getCoordinateSequence();
         int numPoints = coordinateSequence.size();
 
-        Coordinate[] parallelCoordinates = new Coordinate[numPoints];
+        List<LineString> parallelLineStrings = new ArrayList<>();
 
-        for (int i = 0; i < numPoints; i++) {
-            Coordinate p = coordinateSequence.getCoordinate(i);
+        for (int i = 0; i < numPoints - 1; i++) {
+            Coordinate p1 = coordinateSequence.getCoordinate(i);
+            Coordinate p2 = coordinateSequence.getCoordinate(i + 1);
 
-            double dx = 0.0;
-            double dy = 0.0;
-
-            if (i > 0 && i < numPoints - 1) {
-                Coordinate p1 = coordinateSequence.getCoordinate(i - 1);
-                Coordinate p2 = coordinateSequence.getCoordinate(i + 1);
-                dx = p2.x - p1.x;
-                dy = p2.y - p1.y;
-            } else if (i == 0) {
-                Coordinate p2 = coordinateSequence.getCoordinate(1);
-                dx = p2.x - p.x;
-                dy = p2.y - p.y;
-            } else if (i == numPoints - 1) {
-                Coordinate p1 = coordinateSequence.getCoordinate(numPoints - 2);
-                dx = p.x - p1.x;
-                dy = p.y - p1.y;
-            }
+            double dx = p2.x - p1.x;
+            double dy = p2.y - p1.y;
 
             double length = Math.sqrt(dx * dx + dy * dy);
             double ux = dx / length;
@@ -107,10 +80,15 @@ public class ShapeFile {
             double vxScaled = vx * distance;
             double vyScaled = vy * distance;
 
-            parallelCoordinates[i] = new Coordinate(p.x + vxScaled, p.y + vyScaled);
+            Coordinate[] coordinates = {
+                    new Coordinate(p1.x + vxScaled, p1.y + vyScaled),
+                    new Coordinate(p2.x + vxScaled, p2.y + vyScaled)
+            };
+
+            parallelLineStrings.add(geometryFactory.createLineString(coordinates));
         }
 
-        return geometryFactory.createLineString(parallelCoordinates);
+        return parallelLineStrings;
     }
 
 

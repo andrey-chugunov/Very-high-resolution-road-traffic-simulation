@@ -92,51 +92,47 @@ public class Rasterizer {
                 List<LineString> lineStrings = splitMultiLineString(multiLineString);
 
                 for (LineString line : lineStrings) {
-                    for (int i = 0; i < line.getNumPoints() - 1; i++) {
-                        Coordinate p1 = line.getCoordinateN(i);
-                        Coordinate p2 = line.getCoordinateN(i + 1);
-
+                    List<LineString> parallelGeometry1 = shapeFile.generateParallelLineStrings(line, 5);
+                    List<LineString> parallelGeometry2 = shapeFile.generateParallelLineStrings(line, -5);
+                    for (LineString section : parallelGeometry1) {
+                        Coordinate p1 = section.getCoordinateN(0);
+                        Coordinate p2 = section.getCoordinateN(1);
                         int direction = determineDirection(p1, p2);
-                        Geometry parallelGeometry1 = shapeFile.generateParallelLineString(line, 5);
-                        Geometry parallelGeometry2 = shapeFile.generateParallelLineString(line, -5);
-                        Envelope envelope1 = new Envelope(parallelGeometry1.getEnvelopeInternal());
-                        int minPixelX1 = (int) Math.floor(envelope1.getMinX());
-                        int maxPixelX1 = (int) Math.ceil(envelope1.getMaxX());
-                        int minPixelY1 = (int) Math.floor(envelope1.getMinY());
-                        int maxPixelY1 = (int) Math.ceil(envelope1.getMaxY());
+                        Envelope envelope1 = new Envelope(section.getEnvelopeInternal());
+                        int minPixelX = (int) Math.floor(envelope1.getMinX());
+                        int maxPixelX = (int) Math.ceil(envelope1.getMaxX());
+                        int minPixelY = (int) Math.floor(envelope1.getMinY());
+                        int maxPixelY = (int) Math.ceil(envelope1.getMaxY());
 
-                        for (int y = minPixelY1; y < maxPixelY1; y++) {
-                            for (int x = minPixelX1; x < maxPixelX1; x++) {
-                                if (parallelGeometry1.intersects(createPixelRectangle(x, y))) {
-                                    if (direction == 1) {
+                        for (int y = minPixelY; y < maxPixelY; y++) {
+                            for (int x = minPixelX; x < maxPixelX; x++) {
+                                if (section.intersects(createPixelRectangle(x, y))) {
+                                    if (direction == 1 || direction == 3) {
                                         pixelsLine1.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
-                                    } else if (direction == 2) {
-                                        pixelsLine2.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
-                                    } else if (direction == 3) {
-                                        pixelsLine3.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
                                     } else {
-                                        pixelsLine4.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
+                                        pixelsLine2.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
                                     }
                                 }
                             }
                         }
-                        Envelope envelope2 = new Envelope(parallelGeometry2.getEnvelopeInternal());
-                        int minPixelX2 = (int) Math.floor(envelope2.getMinX());
-                        int maxPixelX2 = (int) Math.ceil(envelope2.getMaxX());
-                        int minPixelY2 = (int) Math.floor(envelope2.getMinY());
-                        int maxPixelY2 = (int) Math.ceil(envelope2.getMaxY());
+                    }
+                    for (LineString section : parallelGeometry2) {
+                        Coordinate p1 = section.getCoordinateN(0);
+                        Coordinate p2 = section.getCoordinateN(1);
+                        int direction = determineDirection(p1, p2);
+                        Envelope envelope1 = new Envelope(section.getEnvelopeInternal());
+                        int minPixelX = (int) Math.floor(envelope1.getMinX());
+                        int maxPixelX = (int) Math.ceil(envelope1.getMaxX());
+                        int minPixelY = (int) Math.floor(envelope1.getMinY());
+                        int maxPixelY = (int) Math.ceil(envelope1.getMaxY());
 
-                        for (int y = minPixelY2; y < maxPixelY2; y++) {
-                            for (int x = minPixelX2; x < maxPixelX2; x++) {
-                                if (parallelGeometry2.intersects(createPixelRectangle(x, y))) {
-                                    if (direction == 1) {
+                        for (int y = minPixelY; y < maxPixelY; y++) {
+                            for (int x = minPixelX; x < maxPixelX; x++) {
+                                if (section.intersects(createPixelRectangle(x, y))) {
+                                    if (direction == 1 || direction == 3) {
                                         pixelsLine3.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
-                                    } else if (direction == 2) {
-                                        pixelsLine4.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
-                                    } else if (direction == 3) {
-                                        pixelsLine1.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
                                     } else {
-                                        pixelsLine2.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
+                                        pixelsLine4.add(new Point((int) upperLeftY - y, x - (int) upperLeftX));
                                     }
                                 }
                             }
