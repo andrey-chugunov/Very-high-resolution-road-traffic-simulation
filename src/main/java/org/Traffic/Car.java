@@ -24,6 +24,7 @@ public class Car {
         return speed;
     }
 
+
     public void setPosition(Point position) {
         this.position_x = (int) position.getX();
         this.position_y = (int) position.getY();

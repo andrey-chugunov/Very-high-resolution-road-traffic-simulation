@@ -28,7 +28,7 @@ public class Position {
                 String[] parts = line.split(" ");
                 int x = Integer.parseInt(parts[0]);
                 int y = Integer.parseInt(parts[1]);
-                Point point = new Point(x, y);
+                Point point = new Point(y, x);
                 list.add(point);
             }
             return list;

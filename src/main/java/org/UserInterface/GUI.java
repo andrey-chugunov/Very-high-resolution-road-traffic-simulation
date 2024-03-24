@@ -1,5 +1,6 @@
 package org.UserInterface;
 
+import org.Traffic.Traffic;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.opengis.referencing.FactoryException;
 import org.Rasterization.Raster;
@@ -20,13 +21,17 @@ public class GUI {
     private static GridCoverage2D coverage2D;
     private static int offsetX = -7500;
     private static int offsetY = -15000;
+    private static Traffic traffic;
+    private static double scale = 1;
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
                 Raster raster = new Raster();
                 coverage2D = raster.readGeoTiff(outputPath);
-
+                traffic = new Traffic(coverage2D);
+                traffic.generateCars(50000);
                 createAndShowGUI();
             } catch (FactoryException | IOException e) {
                 e.printStackTrace();
@@ -34,12 +39,11 @@ public class GUI {
         });
     }
 
-    private static void createAndShowGUI() {
+    private static void createAndShowGUI() throws IOException {
         JFrame frame = new JFrame("Raster Viewer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        final Image[] swingImage = {convertToSwingImage(coverage2D)};
-        System.out.println(swingImage[0]);
+        final BufferedImage[] swingImage = {convertToSwingImage(coverage2D)};
 
         ImageIcon icon = new ImageIcon(swingImage[0]);
         JLabel label = new JLabel(icon);
@@ -60,20 +64,45 @@ public class GUI {
                     case KeyEvent.VK_DOWN -> offsetY -= stepY;
                 }
                 swingImage[0] = convertToSwingImage(coverage2D);
-                icon.setImage(swingImage[0]);
+                assert swingImage[0] != null;
+                BufferedImage scaledImage = scaleImage(swingImage[0], (int) (swingImage[0].getWidth() * scale), (int) (swingImage[0].getHeight() * scale));
+                icon.setImage(scaledImage);
                 label.repaint();
             }
         });
 
         label.setFocusable(true);
+
+        label.addMouseWheelListener(e -> {
+            int notches = e.getWheelRotation();
+            double step = 0.3;
+
+            if (notches < 0) {
+                scale += step;
+                scale = Math.min(20.0, scale);
+            } else {
+                scale -= step;
+                scale = Math.max(1.0, scale);
+            }
+        });
+
         frame.getContentPane().add(panel);
         int frameWidth = swingImage[0].getWidth(null);
         int frameHeight = swingImage[0].getHeight(null);
         frame.setSize(frameWidth, frameHeight);
         frame.setVisible(true);
+
+        Timer timer = new Timer(100, e -> {
+            swingImage[0] = convertToSwingImage(coverage2D);
+            swingImage[0] = traffic.makeIteration(swingImage[0], offsetX, offsetY);
+            BufferedImage scaledImage = scaleImage(swingImage[0], (int) (swingImage[0].getWidth() * scale), (int) (swingImage[0].getHeight() * scale));
+            icon.setImage(scaledImage);
+            label.repaint();
+        });
+        timer.start();
     }
 
-    private static Image convertToSwingImage(GridCoverage2D coverage) {
+    private static BufferedImage convertToSwingImage(GridCoverage2D coverage) {
         try {
             return getRenderedImage(coverage);
         } catch (IOException | FactoryException e) {
@@ -91,5 +120,19 @@ public class GUI {
         g.drawRenderedImage(renderedImage, transform);
         g.dispose();
         return bufferedImage;
+    }
+
+    public static BufferedImage scaleImage(BufferedImage originalImage, int newWidth, int newHeight) {
+        BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resizedImage.createGraphics();
+
+        double scaleX = (double) newWidth / originalImage.getWidth();
+        double scaleY = (double) newHeight / originalImage.getHeight();
+
+        AffineTransform at = AffineTransform.getScaleInstance(scaleX, scaleY);
+        g2d.drawRenderedImage(originalImage, at);
+        g2d.dispose();
+
+        return resizedImage;
     }
 }
